@@ -1,0 +1,339 @@
+<section class="main-content">
+    <ul class="breadcrumb breadcrumb-style ">
+      <li class="breadcrumb-item">
+        <h5 class="page-title m-b-0">Table</h5>
+      </li>
+      <li class="breadcrumb-item bcrumb-1">
+        <a routerLink="/dashboard/main">
+          <i class="fas fa-home font-17"></i></a>
+      </li>
+      <li class="breadcrumb-item">Table</li>
+    </ul>
+    <div class="section-body">
+      <div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="card">
+            <div class="p-10">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="row m-0">
+                    <div class="col-lg-3 p-0">
+                      <div class="ngxTableHeader">
+                        <div class="table-title">
+                          <h2><strong>Advance Table</strong></h2>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-5 p-0">
+                      <div class="ngxTableHeader">
+                        <div class="table-search-area">
+                          <div>
+                            <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                            <input placeholder="Search" type="text" class="browser-default search-field"
+                              (keyup)='filterDatatable($event)' aria-label="Search box">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4 p-0">
+                      <div class="ngxTableHeader">
+                        <div class="header-buttons-left">
+                          <div class="icon-button-demo buttons">
+                            <button class="btn btn-icon icon-left btn-primary rounded-button" (click)='addRow(addRecord)'>
+                              <i class="material-icons">add</i>
+                            </button>
+                            <button [hidden]=!isRowSelected class="btn btn-icon icon-left btn-danger rounded-button"
+                              (click)='deleteSelected()'>
+                              <i class="material-icons">delete</i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ngx-datatable #table class="material" [rows]="listTasks" [loadingIndicator]="loadingIndicator"
+                columnMode="force" [headerHeight]="60" [footerHeight]="80" rowHeight="auto" [limit]="10"
+                [scrollbarH]="scrollBarHorizontal" [reorderable]="reorderable" [selected]="selected"
+                [selectionType]="'checkbox'" (select)='onSelect($event)'>
+  
+                <ngx-datatable-column [width]="70" [sortable]="false" [draggable]="false" [resizeable]="false"
+                  [canAutoResize]="false" [headerCheckboxable]="true" [checkboxable]="true">
+                </ngx-datatable-column>
+  
+                <ngx-datatable-column [width]="200" name="name">
+                  <ng-template let-row="row" let-value="value" let-i="index" ngx-datatable-cell-template>
+                    <div class="name-col-style">
+                      <div>{{row.name}}</div>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Description" [width]="100">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.description}}
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="startDate" [width]="100">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      {{row.startDate}}
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="endDate" [width]="100">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      {{row.endDate}}
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="etatTask">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <div *ngIf="row.etatTask=='DONE'" class="badge-outline col-green">{{row.etatTask}}
+                    </div>
+                    <div *ngIf="row.etatTask=='IN_PROGRESS'" class="badge-outline col-indigo">{{row.etatTask}}
+                    </div>
+                    <div *ngIf="row.etatTask=='NOT_STARTED'" class="badge-outline col-red">{{row.etatTask}}
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="100" name="Actions" sortable="false">
+                  <ng-template let-value="value" let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    <span>
+                      <button class="btn btn-tbl-edit h-auto" (click)='editRow(row, rowIndex, editRecord)'>
+                        <i class="fas fa-pen"></i>
+                      </button>
+                      <button class="btn btn-tbl-delete h-auto" (click)='deleteSingleRow(row)'>
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    </span>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            
+              
+              <ng-template #addRecord let-modal>
+                <div class="modal-header editRowModal">
+                  <h4 class="modal-title" id="modal-basic-title">
+                    <div class="table-modal-header">
+                      <img [src]='newUserImg' alt="avatar">
+                      <div class="modal-about">
+                        <div class="fw-bold p-t-10 font-17">
+                          New task</div>
+                      </div>
+                    </div>
+                  </h4>
+                  <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+                    <span aria-hidden="true"><i class="material-icons">close</i></span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form class="register-form" [formGroup]="register" (ngSubmit)="onAddRowSave(register)" #form="ngForm">
+                    <div class="input-field col s12 d-none">
+                    </div>
+                    <div class="input-field col s12 d-none">
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="name" formControlName="name" required minlength="3" pattern="^[a-zA-Z1-9]+$">
+                      </div>
+                    </div>
+                    <!--div class="row">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>image_recette<span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" placeholder="image" formControlName="image" (change)="onFileSelected($event)" required>
+                      </div>
+                    </div-->
+                   <!--  <div class="row">
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                        <label>description<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="description" placeholder="description"  required>
+                          div  class="alert alert-danger" ><p>required</p></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                          <label>startDate<span class="text-danger">*</span></label>
+                          <input type="date" class="form-control" name="startDate" placeholder="startDate"  >
+                          <div  class="alert alert-danger" ><p>required</p></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                          <label>endDate<span class="text-danger">*</span></label>
+                          <input type="date" class="form-control" name="endDate" placeholder="endDate"  >
+                          <div  class="alert alert-danger" ><p>required</p></div>
+                        </div>
+                    </div> -->
+
+                  
+                  <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                    <label>startDate <span class="text-danger"></span></label>
+                    <input type="date" class="form-control" placeholder="startDate" formControlName="startDate">
+                  </div>
+                  
+              
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                    <label>endDate <span class="text-danger"></span></label>
+                    <input type="date" class="form-control" placeholder="endDate" formControlName="endDate">
+                </div>
+          
+                <div class="row">
+                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                    <label>description<span class="text-danger"></span></label>
+                    <textarea type="textarea" class="form-control" placeholder="description"
+                      formControlName="description"></textarea>
+                  </div>
+                </div>
+
+                  
+                    <div>
+                      <label>etatTask<span class="text-danger">*</span></label>
+                      <select class="form-select" name="etatTask" aria-label="Default select example"  formControlName="etatTask">
+                      <option *ngFor="let etatTask of etatTaskOptions" type="checkbox" [ngValue]="etatTask">{{etatTask}}</option>
+                    </select>
+                    <!--select [(ngModel)]="selectedEtatTask">
+                      <option *ngFor="let etatTask of etatTaskOptions" [value]="etatTask">{{ etatTask }}</option>
+                    </select-->
+                    
+                  </div>
+
+                    <!--div>
+                      <label>StartDate<span class="text-danger">*</span></label>
+                      <select class="form-select" name="startDate" aria-label="Default select example"  formControlName="startDate" multiple>
+                      <option *ngFor="let ingredient of ingredients" type="checkbox" [ngValue]="startDate">{{ingredient.nom}}</option>
+                    </select>
+                  </div-->
+
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary" [disabled]="!register.valid">Submit</button>
+                      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+                    </div>
+                  </form>
+                </div>
+              </ng-template>
+              <!--this is the new add-->
+              <!--ng-template #addRecord let-modal>
+                <div class="modal-header editRowModal">
+                  <h4 class="modal-title" id="modal-basic-title">
+                    <div class="table-modal-header">
+                      <img [src]='newUserImg' alt="avatar">
+                      <div class="modal-about">
+                        <div class="fw-bold p-t-10 font-17">
+                          Nouvelle Recette</div>
+                      </div>
+                    </div>
+                  </h4>
+                  <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+                    <span aria-hidden="true"><i class="material-icons">close</i></span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form class="register-form" [formGroup]="register" (ngSubmit)="onAddRowSave(register)" #f="ngForm">
+                    <div class="input-field col s12 d-none">
+                    </div>
+                    <div class="input-field col s12 d-none">
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>nom_recette <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="nom" formControlName="nom" required minlength="3" pattern="^[a-zA-Z]+$">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>image_recette<span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" placeholder="image" formControlName="image" (change)="onFileSelected($event)" required>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                        <label>description_recette<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="description" placeholder="description" formControlName="description" required minlength="10">
+                        <div  class="alert alert-danger"><p>price is required</p></div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                        <label>Ingrédients<span class="text-danger">*</span></label>
+                        <select class="form-control" formControlName="ingredients" multiple required>
+                          <option *ngFor="let ingredient of ingredients" [value]="ingredient">{{ingredient.nom}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary" [disabled]="!register.valid">Submit</button>
+                      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+                    </div>
+                  </form>
+                </div>
+              </ng-template-->
+              
+              
+              <!-- Edit Record Modal Window -->
+              <ng-template #editRecord let-modal>
+                <div class="modal-header editRowModal">
+                  <h4 class="modal-title" id="modal-basic-title">
+                    <div class="table-modal-header">
+                      <img [src]='selectedRowData?.img' alt="avatar">
+                      <div class="modal-about">
+                        <div class="fw-bold p-t-10 font-17">
+                          {{selectedRowData?.firstName}}
+                          {{selectedRowData?.lastName}}</div>
+                      </div>
+                    </div>
+                  </h4>
+                  <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                    <span aria-hidden="true"><i class="material-icons">close</i></span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                <form [formGroup]="editForm" (ngSubmit)="onEditSave(editForm)">
+                    <!--div class="input-field col s12 d-none">
+                      <input formControlName="id" class="form-control" type="hidden">
+                    </div-->
+                    <div class="row">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="name" formControlName="name"
+                          required>
+                      
+                      </div>
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>startDate <span class="text-danger"></span></label>
+                        <input type="date" class="form-control" placeholder="startDate" formControlName="startDate">
+                      </div>
+                      
+                  
+                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <label>endDate <span class="text-danger"></span></label>
+                        <input type="date" class="form-control" placeholder="endDate" formControlName="endDate">
+                    </div>
+              
+                    <div class="row">
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                        <label>description<span class="text-danger"></span></label>
+                        <textarea type="textarea" class="form-control" placeholder="description"
+                          formControlName="description"></textarea>
+                      </div>
+                    </div>
+                    <div>
+                      <label>etatTask<span class="text-danger">*</span></label>
+                      <select class="form-select" name="etatTask" aria-label="Default select example"  formControlName="etatTask">
+                      <option *ngFor="let etatTask of etatTaskOptions" type="checkbox" [ngValue]="etatTask">{{etatTask}}</option>
+                    </select>
+                    </div>
+                  
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary" [disabled]="!editForm.valid">Save</button>
+                      <button type="button" class="btn btn-light" (click)="modal.close()">Close</button>
+                    </div>
+                    </div>
+                </form>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
